@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 1,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -14,7 +14,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 2,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -32,7 +32,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 3,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -40,28 +40,88 @@
     "import sqlalchemy\n",
     "from sqlalchemy.ext.automap import automap_base\n",
     "from sqlalchemy.orm import Session\n",
-    "from sqlalchemy import create_engine, func"
+    "from sqlalchemy import create_engine, func\n"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 4,
    "metadata": {},
    "outputs": [],
    "source": [
-    "# create engine to hawaii.sqlite\n",
-    "engine = create_engine(\"sqlite:///hawaii.sqlite\")"
+    "# create engine to hawaii.sqlite (BZ had to add Resources/)\n",
+    "engine = create_engine(\"sqlite:///Resources/hawaii.sqlite\")"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 5,
    "metadata": {},
    "outputs": [],
    "source": [
     "# reflect an existing database into a new model\n",
+    "# Declare a Base using `automap_base()`\n",
+    "Base = automap_base()\n",
     "\n",
-    "# reflect the tables\n"
+    "# reflect the tables\n",
+    "# Use the Base class to reflect the database tables\n",
+    "Base.prepare(engine, reflect=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['measurement', 'station']"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# View all of the classes that automap found\n",
+    "# Print all of the classes mapped to the Base\n",
+    "Base.classes.keys() "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Measurement: <class 'sqlalchemy.ext.automap.measurement'>\n",
+      "Station: <class 'sqlalchemy.ext.automap.station'>\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Save references to each table\n",
+    "# Assign the dow class to a variable called `Dow`\n",
+    "Measurement = Base.classes.measurement\n",
+    "Station = Base.classes.station\n",
+    "print(f'Measurement: {Measurement}')\n",
+    "print(f'Station: {Station}')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Create our session (link) from Python to the DB\n",
+    "# Create a session\n",
+    "session = Session(engine)"
    ]
   },
   {
@@ -69,8 +129,51 @@
    "execution_count": null,
    "metadata": {},
    "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 97,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Measurement_row.__dict__: {'_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x0000025DA2E06D00>, 'date': '2010-01-01', 'tobs': 65.0, 'id': 1, 'station': 'USC00519397', 'prcp': 0.08}\n",
+      "('2010-01-01', 65.0, 1, 'USC00519397', 0.08)\n",
+      "('2010-01-02', 63.0, 2, 'USC00519397', 0.0)\n",
+      "('2010-01-03', 74.0, 3, 'USC00519397', 0.0)\n",
+      "('2010-01-04', 76.0, 4, 'USC00519397', 0.0)\n",
+      "('2010-01-06', 73.0, 5, 'USC00519397', None)\n",
+      "('2010-01-07', 70.0, 6, 'USC00519397', 0.06)\n",
+      "('2010-01-08', 64.0, 7, 'USC00519397', 0.0)\n",
+      "('2010-01-09', 68.0, 8, 'USC00519397', 0.0)\n",
+      "('2010-01-10', 73.0, 9, 'USC00519397', 0.0)\n",
+      "('2010-01-11', 64.0, 10, 'USC00519397', 0.01)\n",
+      "Station_row.__dict__: {'_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x0000025DA6FFC100>, 'id': 1, 'longitude': -157.8168, 'latitude': 21.2716, 'station': 'USC00519397', 'name': 'WAIKIKI 717.2, HI US', 'elevation': 3.0}\n",
+      "(1, -157.8168, 21.2716, 'USC00519397', 'WAIKIKI 717.2, HI US', 3.0)\n",
+      "(2, -157.8015, 21.4234, 'USC00513117', 'KANEOHE 838.1, HI US', 14.6)\n",
+      "(3, -157.8374, 21.5213, 'USC00514830', 'KUALOA RANCH HEADQUARTERS 886.9, HI US', 7.0)\n"
+     ]
+    }
+   ],
    "source": [
-    "# View all of the classes that automap found\n"
+    "# Display the row's columns and data in dictionary format\n",
+    "# Use the session to query Measurement table and display the row's columns and data in dictionary format\n",
+    "M=Measurement\n",
+    "Measurement_row = session.query(M).first()\n",
+    "print(f'Measurement_row.__dict__: {Measurement_row.__dict__}')\n",
+    "\n",
+    "for row in session.query(M.date, M.tobs, M.id, M.station, M.prcp).limit(10).all():\n",
+    "    print(row)\n",
+    "    \n",
+    "S=Station\n",
+    "Station_row = session.query(S).first()\n",
+    "print(f'Station_row.__dict__: {Station_row.__dict__}')\n",
+    "\n",
+    "for row in session.query(S.id, S.longitude, S.latitude, S.station, S.name, S.elevation).limit(3).all():\n",
+    "    print(row)"
    ]
   },
   {
@@ -78,18 +181,7 @@
    "execution_count": null,
    "metadata": {},
    "outputs": [],
-   "source": [
-    "# Save references to each table\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "# Create our session (link) from Python to the DB\n"
-   ]
+   "source": []
   },
   {
    "cell_type": "markdown",
@@ -100,16 +192,16 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 99,
    "metadata": {},
    "outputs": [],
    "source": [
-    "# Find the most recent date in the data set."
+    "# Find the most recent date in the data set.\n"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 10,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -135,7 +227,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 11,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -151,7 +243,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 12,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -160,7 +252,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 13,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -170,7 +262,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 14,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -179,7 +271,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 15,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -196,7 +288,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 35,
    "metadata": {},
    "outputs": [],
    "source": [
