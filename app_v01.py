@@ -9,7 +9,13 @@ app = Flask(__name__)
 # 3. Define static routes
 @app.route("/")
 def index():
-    return "Test Hello, world!"
+    return (
+        f"Welcome to my SQLAlchemy Climate App Homepage. Avaialble routes:<br/>"
+        f"/api/v1.0/precipitation<br/>"
+        f"/api/v1.0/stations<br/>"
+        f"/api/v1.0/tobs<br/>"
+        f"/api/v1.0/<start> and /api/v1.0/<start>/<end>"
+    )
 
 
 @app.route("/about")
