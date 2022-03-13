@@ -108,7 +108,7 @@ def tobs():
     min_date = '2016-08-23'
     #most_active is the most active station  
     most_active = 'USC00519281'
-    temps_for_12 = []
+    station_counts_df = []
     
     print()
     print(f'Entering tobs')
@@ -120,10 +120,10 @@ def tobs():
     session.close()
 
     # Save the query results as a Pandas DataFrame
-    station_counts_df = pd.DataFrame(results['Date'], results['Temperature'])
-    station_counts_df.set_index('Date', inplace=True)
-
-    return jsonify(station_counts_df)
+    #station_counts_df = pd.DataFrame(results['Date'], results['Temperature'])
+    #station_counts_df.set_index('Date', inplace=True)
+    all_temps = list(np.ravel(results))
+    return jsonify(all_temps)
 
 
 @app.route("/api/v1.0/<start>")
