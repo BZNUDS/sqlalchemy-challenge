@@ -126,16 +126,19 @@ def tobs():
 
 
 @app.route("/api/v1.0/<start>")
-def start_route(start=None):
+def start_route(start):
     # Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for all dates greater than and equal to the start date."
     # Special thanks to TA Mohammad Hamza for helping student Ryan T with his homework during office hours
     # as I was also struggling with the @app.route logic/code and their colaboration helped me better understand what to do
     print(f'start: {start}')
     print()
     results = session.query(func.min(M.tobs), func.avg(M.tobs), func.max(M.tobs)).\
-        filter(M.date >= start).all()
+        filter(M.date >= start).\
+        order_by(M.date).all()
     session.close()
     
+    print(f'results in start_route: {results}')
+
     all_temps = list(np.ravel(results))
     return jsonify(all_temps)
 
@@ -150,7 +153,7 @@ def start_end_route(start=None,end=None):
         filter(M.date <= end).\
         filter(M.date >= start).all()
     session.close()
-    print(results)
+    print(f'results in start_end_route: {results}')
 
     all_temps = list(np.ravel(results))
     return jsonify(all_temps)
