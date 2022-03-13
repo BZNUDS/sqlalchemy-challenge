@@ -43,6 +43,7 @@ app = Flask(__name__)
 M=Measurement
 S=Station
 
+
 # 3. Define static routes
 @app.route("/")
 def index():
@@ -52,8 +53,8 @@ def index():
         f"/api/v1.0/precipitation  Converts the query results to a dictionary using date as the key and prcp as the value. Returns JSON representation of the dictionary.<br/>" 
         f"/api/v1.0/stations  Returns a JSON list of stations from the dataset.<br/>"
         f"/api/v1.0/tobs  Queries the dates and temperature observations of the most active station for the last year of data. Returns a JSON list of the TOBS for the previous year.<br/>"
-        f"/api/v1.0/<start>  Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for all dates greater than and equal to the start date.<br/>"
-        f"/api/v1.0/<start>/<end>  Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for the dates between the start and end date inclusive.<br/>"
+        f"/api/v1.0/yyyy-mm-dd  Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for all dates greater than and equal to the start date.<br/>"
+        f"/api/v1.0/yyyy-mm-dd, yyyy-mm-dd  Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for the dates between the start and end date inclusive.<br/>"
     )
 
 
@@ -77,17 +78,13 @@ def precipitation():
 
 @app.route("/api/v1.0/stations")
 def stations():
+    # Returns a JSON list of stations from the dataset.
+    
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    
     # Query all stations
-    print()
-    print(f'Entering stations')
-    print()
-
     results = session.query(S.station).all()
-    print(f'Station results: {results}')
     session.close()
 
     # Convert list of tuples into normal list
@@ -101,8 +98,9 @@ def stations():
 def tobs():
     # Queries the dates and temperature observations of the most active station for the last year of data. 
     # Returns a JSON list of the TOBS for the previous year.
-    # Special tahnks to TA Mohammad Hamza for helping student Ryan T with his homework during office hours
-    # as I was also strug;ling with the @app.route logic/code
+    # Special thanks to TA Mohammad Hamza for helping student Ryan T with his homework during office hours
+    # as I was also struggling with the @app.route logic/code and their colaboration helped me
+
     # Re-using what we already determined/reported in climate_starter_Final.ipynb
     # min_date is the date 12 months prior to last date in our data
     min_date = '2016-08-23'
@@ -122,24 +120,40 @@ def tobs():
     # Save the query results as a Pandas DataFrame
     #station_counts_df = pd.DataFrame(results['Date'], results['Temperature'])
     #station_counts_df.set_index('Date', inplace=True)
+
     all_temps = list(np.ravel(results))
     return jsonify(all_temps)
 
 
 @app.route("/api/v1.0/<start>")
-def start():
-    name = "Can't use the Start word twice"
-    location = "Tien Shan"
-
-    return f"My name is {name}, and I live in {location}."
+def start_route(start=None):
+    # Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for all dates greater than and equal to the start date."
+    # Special thanks to TA Mohammad Hamza for helping student Ryan T with his homework during office hours
+    # as I was also struggling with the @app.route logic/code and their colaboration helped me better understand what to do
+    print(f'start: {start}')
+    print()
+    results = session.query(func.min(M.tobs), func.avg(M.tobs), func.max(M.tobs)).\
+        filter(M.date >= start).all()
+    session.close()
+    
+    all_temps = list(np.ravel(results))
+    return jsonify(all_temps)
 
 
 @app.route("/api/v1.0/<start>/<end>")
-def start_end():
-    name = "Can't use the S word twice???"
-    location = "Tien Shan"
+def start_end_route(start=None,end=None):
+    # Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for the dates between the start and end date inclusive.)"
+    print(f'start: {start}')
+    print(f'end: {end}')
+    print()
+    results = session.query(func.min(M.tobs), func.avg(M.tobs), func.max(M.tobs)).\
+        filter(M.date <= end).\
+        filter(M.date >= start).all()
+    session.close()
+    print(results)
 
-    return f"My name is {name}, and I live in {location}."
+    all_temps = list(np.ravel(results))
+    return jsonify(all_temps)
 
 
 # 4. Define main behavior
