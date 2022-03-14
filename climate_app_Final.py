@@ -1,4 +1,4 @@
-# 1. Import Flask and add other
+# 1. Import Flask and others as needed/expected
 from flask import Flask, jsonify
 import numpy as np
 import pandas as pd
@@ -53,8 +53,8 @@ def index():
         f"/api/v1.0/precipitation  Converts the query results to a dictionary using date as the key and prcp as the value. Returns JSON representation of the dictionary.<br/>" 
         f"/api/v1.0/stations  Returns a JSON list of stations from the dataset.<br/>"
         f"/api/v1.0/tobs  Queries the dates and temperature observations of the most active station for the last year of data. Returns a JSON list of the TOBS for the previous year.<br/>"
-        f"/api/v1.0/yyyy-mm-dd  Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for all dates greater than and equal to the start date.<br/>"
-        f"/api/v1.0/yyyy-mm-dd, yyyy-mm-dd  Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for the dates between the start and end date inclusive.<br/>"
+        f"/api/v1.0/yyyy-mm-dd  Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for all dates greater than and equal to the start date given in the format yyyy-mm-d. <br/>"
+        f"/api/v1.0/yyyy-mm-dd/yyyy-mm-dd  Returns a JSON list of the TMIN, TAVG, and TMAX Temperatures for the dates between the start and end dates inclusive given in the format yyyy-mm-dd.<br/>"
     )
 
 
@@ -142,7 +142,10 @@ def start_route(start):
     print(f'results in start_route: {results}')
 
     all_temps = list(np.ravel(results))
-    return jsonify(all_temps)
+    # return jsonify(all_temps)
+    return (jsonify(all_temps)
+    )
+
 
 
 @app.route("/api/v1.0/<start>/<end>")
@@ -159,7 +162,6 @@ def start_end_route(start=None,end=None):
 
     all_temps = list(np.ravel(results))
     return jsonify(all_temps)
-
 
 # 4. Define main behavior
 if __name__ == "__main__":
