@@ -107,6 +107,8 @@ def tobs():
     #most_active is the most active station  
     most_active = 'USC00519281'
     station_counts_df = []
+    start=''
+    end=''
     
     print()
     print(f'Entering tobs')
